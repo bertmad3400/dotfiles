@@ -1,0 +1,185 @@
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+source "$CONFIG_DIR/../colors.sh"
+
+##### Bar Appearance #####
+
+sketchybar --bar \
+    position=top  \
+    height=32  \
+    y_offset=0  \
+    padding_left=8  \
+    padding_right=8 \
+    color=0xff000000  \
+
+
+##### Changing Defaults #####
+
+default=(
+  icon.font="Hack Nerd Font:Bold:17.0"
+  label.font="Hack Nerd Font:Bold:14.0"
+  icon.color=0xffffffff
+  label.color=0xffffffff
+  icon.padding_left=3
+  icon.padding_right=3
+  label.padding_left=3
+  label.padding_right=3
+)
+sketchybar --default "${default[@]}"
+
+
+##### Spaces #####
+
+sketchybar --add event aerospace_workspace_change
+
+for WORKSPACE_AND_DISPLAY in $(aerospace list-workspaces --all --format "%{workspace},%{monitor-id}"); do
+
+    WORKSPACE=$(echo $WORKSPACE_AND_DISPLAY | cut -d, -f1)
+    DISPLAY=$(echo $WORKSPACE_AND_DISPLAY | cut -d, -f2)
+
+    sketchybar --add item space.$WORKSPACE left \
+        --set space.$WORKSPACE \
+        display=$DISPLAY \
+        label="$WORKSPACE" \
+        label.color="0xffffffff" \
+        label.drawing=on \
+        label.font="Hack Nerd Font:Bold:16.0" \
+        label.padding_left=6 \
+        label.padding_right=6 \
+        icon="$WORKSPACE" \
+        icon.color="0xff000000" \
+        icon.font="Hack Nerd Font:Bold:16.0" \
+        icon.padding_left=6 \
+        icon.padding_right=6 \
+        icon.drawing=off \
+        background.color=0xffffffff \
+        background.corner_radius=5 \
+        background.height=20 \
+        background.drawing=off \
+        click_script="aerospace workspace $WORKSPACE"
+done
+
+sketchybar --add item space.focus left --set space.focus script="$PLUGIN_DIR/aerospace-focus.sh" --subscribe space.focus aerospace_workspace_change
+sketchybar --add item space.used left --set space.used script="$PLUGIN_DIR/aerospace-used.sh" update_freq=1
+
+##### Ressources #####
+
+
+
+
+# Network connection (ip/vpn/no connection)
+sketchybar --add item ip right                          \
+           --set      ip script="$PLUGIN_DIR/ip.sh"     \
+                           update_freq=30               \
+
+
+sketchybar --add item divider.1 right \
+           --set      divider.1 \
+                                background.color=0x66ffffff \
+                                background.corner_radius=5  \
+                                background.height=16        \
+                                label.padding_right=0       \
+                                label.padding_left=0        \
+                                icon.padding_right=0        \
+                                icon.padding_left=0         \
+                                background.padding_left=16  \
+                                background.padding_right=16
+
+# Network traffic
+sketchybar --add item network_up right                  \
+           --set      network_up                        \
+                           icon=                       \
+                           icon.color=$COLOR_BLUE       \
+                           label.color=$COLOR_BLUE      \
+                           label.width=50
+
+
+sketchybar --add item network_down right                \
+           --set      network_down                      \
+                           icon=                       \
+                           icon.color=$COLOR_RED        \
+                           label.color=$COLOR_RED       \
+                           label.width=50
+
+# Divider
+sketchybar --add item divider.2 right \
+           --set      divider.2 \
+                                background.color=0x66ffffff \
+                                background.corner_radius=5  \
+                                background.height=16        \
+                                label.padding_right=0       \
+                                label.padding_left=0        \
+                                icon.padding_right=0        \
+                                icon.padding_left=0         \
+                                background.padding_left=16  \
+                                background.padding_right=16
+
+
+# Volume
+sketchybar --add item  volume right                          \
+           --set       volume script="$PLUGIN_DIR/volume.sh" \
+           --subscribe volume volume_change
+
+# Battery
+sketchybar --add item battery right                           \
+           --set      battery script="$PLUGIN_DIR/battery.sh" \
+                              update_freq=10                  \
+                              background.padding_right=8      \
+           --subscribe battery system_woke power_source_change
+
+# Divider
+sketchybar --add item divider.3 right \
+           --set      divider.3 \
+                                background.color=0x66ffffff \
+                                background.corner_radius=5 \
+                                background.height=16 \
+                                label.padding_right=0 \
+                                label.padding_left=0 \
+                                icon.padding_right=0 \
+                                icon.padding_left=0 \
+                                background.padding_left=16 \
+                                background.padding_right=16
+
+# Swap
+sketchybar --add item swap right                        \
+           --set      swap script="$PLUGIN_DIR/swap.sh" \
+                           update_freq=60               \
+                           icon=󰁯                       \
+                           icon.color=$COLOR_CYAN       \
+                           label.color=$COLOR_CYAN      \
+                           background.padding_right=8
+
+
+# Ram
+sketchybar --add item ram right                         \
+           --set      ram script="$PLUGIN_DIR/ram.sh"   \
+                          update_freq=5                 \
+                          icon=󰓅                        \
+                          icon.color=$COLOR_GREEN       \
+                          label.color=$COLOR_GREEN      \
+                          background.padding_right=8
+
+
+# Disk
+sketchybar --add item disk right                        \
+           --set      disk script="$PLUGIN_DIR/disk.sh" \
+                           update_freq=60               \
+                           icon=󰋊                       \
+                           icon.color=$COLOR_YELLOW     \
+                           label.color=$COLOR_YELLOW    \
+                           background.padding_right=8
+
+
+# CPU
+sketchybar --add item cpu right \
+           --set      cpu script="$PLUGIN_DIR/cpu.sh" \
+                          update_freq=1               \
+                          icon=󰘚                      \
+                          icon.color=$COLOR_RED       \
+                          label.color=$COLOR_RED      \
+                          background.padding_right=8
+
+
+source "$PLUGIN_DIR/network.sh"
+
+##### Force all scripts to run the first time (never do this in a script) #####
+sketchybar --update
