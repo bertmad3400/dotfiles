@@ -1,0 +1,20 @@
+# open iTerm (moved from aerospace)
+ctrl + cmd + alt - return : osascript -e 'tell application "iTerm"' \
+                                      -e 'create window with default profile' \
+                                      -e 'activate' \
+                                      -e 'end tell'
+
+# open Mattermost
+ctrl + cmd + alt - m : open -a Mattermost
+
+# open new Firefox window (lands in current AeroSpace workspace)
+ctrl + cmd + alt - f : /Applications/Firefox.app/Contents/MacOS/firefox --new-window &
+
+# open 1Password
+ctrl + cmd + alt - n : open -a 1Password
+
+# open Discord
+ctrl + cmd + alt - v : open -a Discord
+
+# open Bitwarden
+ctrl + cmd + alt - z : open -a Bitwarden

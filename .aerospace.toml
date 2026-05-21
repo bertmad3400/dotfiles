@@ -90,13 +90,6 @@ backtick="equal"
 # ---------------------------------------------------------------------------
 [mode.main.binding]
 
-ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
-    tell application "iTerm"
-        create window with default profile
-        activate
-    end tell'
-'''
-
 ctrl-shift-alt-cmd-right = 'layout floating tiling'
 ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
 
@@ -173,13 +166,6 @@ ctrl-shift-alt-cmd-aa = 'mode service'
 # ---------------------------------------------------------------------------
 [mode.space-b.binding]
 
-ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
-    tell application "iTerm"
-        create window with default profile
-        activate
-    end tell'
-'''
-
 ctrl-shift-alt-cmd-right = 'layout floating tiling'
 ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
 
@@ -252,13 +238,6 @@ ctrl-shift-alt-cmd-aa = 'mode service'
 # space-c mode = SPACE C
 # ---------------------------------------------------------------------------
 [mode.space-c.binding]
-
-ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
-    tell application "iTerm"
-        create window with default profile
-        activate
-    end tell'
-'''
 
 ctrl-shift-alt-cmd-right = 'layout floating tiling'
 ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
@@ -333,13 +312,6 @@ ctrl-shift-alt-cmd-aa = 'mode service'
 # ---------------------------------------------------------------------------
 [mode.space-d.binding]
 
-ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
-    tell application "iTerm"
-        create window with default profile
-        activate
-    end tell'
-'''
-
 ctrl-shift-alt-cmd-right = 'layout floating tiling'
 ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
 
@@ -412,13 +384,6 @@ ctrl-shift-alt-cmd-aa = 'mode service'
 # space-e mode = SPACE E
 # ---------------------------------------------------------------------------
 [mode.space-e.binding]
-
-ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
-    tell application "iTerm"
-        create window with default profile
-        activate
-    end tell'
-'''
 
 ctrl-shift-alt-cmd-right = 'layout floating tiling'
 ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
