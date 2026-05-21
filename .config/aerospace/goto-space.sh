@@ -8,11 +8,7 @@
 LETTER="$1"
 
 case "$LETTER" in
-    A) MODE="main" ;;
-    B) MODE="space-b" ;;
-    C) MODE="space-c" ;;
-    D) MODE="space-d" ;;
-    E) MODE="space-e" ;;
+    A|B|C|D|E) ;;
     *) echo "letter must be A..E" >&2; exit 1 ;;
 esac
 
@@ -21,5 +17,5 @@ STATE_DIR="${STATE_DIR%/}/aerospace-last-digit"
 DIGIT=$(cat "$STATE_DIR/$LETTER" 2>/dev/null)
 [ -z "$DIGIT" ] && DIGIT=1
 
-aerospace mode "$MODE"
+# Mode is updated by exec-on-workspace-change (sync-mode.sh).
 aerospace workspace "${LETTER}${DIGIT}"
