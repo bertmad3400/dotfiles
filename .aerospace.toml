@@ -12,11 +12,11 @@ after-login-command = []
 # You can use it to add commands that run after AeroSpace startup.
 # 'after-startup-command' is run after 'after-login-command'
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
-after-startup-command = ['exec-and-forget ~/Downloads/SketchyBar/bin/sketchybar']
+after-startup-command = []
 
 # Notify Sketchybar about workspace change
 exec-on-workspace-change = ['/bin/bash', '-c',
-    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE'
+    '/Users/bertmad/.config/aerospace/record-digit.sh "$AEROSPACE_FOCUSED_WORKSPACE"; sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE'
 ]
 
 # Start AeroSpace at login
@@ -51,12 +51,6 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 on-focus-changed = "move-mouse window-lazy-center"
 
 # Gaps between windows (inner-*) and between monitor edges (outer-*).
-# Possible values:
-# - Constant:     gaps.outer.top = 8
-# - Per monitor:  gaps.outer.top = [{ monitor.main = 16 }, { monitor."some-pattern" = 32 }, 24]
-#                 In this example, 24 is a default value when there is no match.
-#                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
-#                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
 inner.horizontal = 0
 inner.vertical =   0
@@ -77,30 +71,25 @@ plus="minus"
 backtick="equal"
 
 
+# ============================================================================
+# Layered workspaces
+# ----------------------------------------------------------------------------
+# 5 "spaces" (A..E), each containing 10 workspaces (X0..X9 = 50 total).
+# - `main` mode IS space A (AeroSpace requires a `main` mode).
+# - `space-b`..`space-e` modes correspond to spaces B..E.
+# - Within any mode, ctrl-cmd-alt-{0..9} jumps to that space's workspace N.
+# - ctrl-cmd-alt-{a..e} switches active space (mode + jump to X0).
+# - ctrl-shift-alt-cmd-{0..9} moves the focused window to workspace N in the
+#   current space.
+# - All non-workspace bindings (focus/move/resize/terminal/service) are
+#   duplicated across modes since AeroSpace modes don't inherit.
+# ============================================================================
 
-
-# 'main' binding mode declaration
-# See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
-# 'main' binding mode must be always presented
+# ---------------------------------------------------------------------------
+# main mode = SPACE A
+# ---------------------------------------------------------------------------
 [mode.main.binding]
 
-# All possible keys:
-# - Letters.        a, b, c, ..., z
-# - Numbers.        0, 1, 2, ..., 9
-# - Keypad numbers. keypad0, keypad1, keypad2, ..., keypad9
-# - F-keys.         f1, f2, ..., f20
-# - Special keys.   minus, equal, period, comma, slash, backslash, quote, semicolon, backtick,
-#                   leftSquareBracket, rightSquareBracket, space, enter, esc, backspace, tab
-# - Keypad special. keypadClear, keypadDecimalMark, keypadDivide, keypadEnter, keypadEqual,
-#                   keypadMinus, keypadMultiply, keypadPlus
-# - Arrows.         left, down, up, right
-
-# All possible modifiers: cmd, alt, shift, shift
-
-# All possible commands: https://nikitabobko.github.io/AeroSpace/commands
-
-# See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
-# You can uncomment the following lines to open up terminal with alt + enter shortcut (like in i3)
 ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
     tell application "iTerm"
         create window with default profile
@@ -108,11 +97,8 @@ ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
     end tell'
 '''
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#layout
 ctrl-shift-alt-cmd-right = 'layout floating tiling'
 ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
-
-# See: https://nikitabobko.github.io/AeroSpace/commands#focus
 
 ctrl-cmd-alt-u = 'focus --boundaries-action wrap-around-the-workspace left'
 ctrl-cmd-alt-i = 'focus --boundaries-action wrap-around-the-workspace down'
@@ -124,72 +110,391 @@ ctrl-shift-alt-cmd-i = 'move down'
 ctrl-shift-alt-cmd-o = 'move up'
 ctrl-shift-alt-cmd-p = 'move right'
 
-
 ctrl-cmd-alt-h = 'focus-monitor --wrap-around prev'
 ctrl-cmd-alt-l = 'focus-monitor --wrap-around next'
-ctrl-cmd-alt-j = 'workspace --wrap-around prev'
-ctrl-cmd-alt-k = 'workspace --wrap-around next'
+ctrl-cmd-alt-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus prev'
+ctrl-cmd-alt-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus next'
 
 ctrl-shift-alt-cmd-h = 'move-node-to-monitor --focus-follows-window --wrap-around prev'
 ctrl-shift-alt-cmd-l = 'move-node-to-monitor --focus-follows-window --wrap-around next'
-ctrl-shift-alt-cmd-j = 'move-node-to-workspace --focus-follows-window --wrap-around prev'
-ctrl-shift-alt-cmd-k = 'move-node-to-workspace --focus-follows-window --wrap-around next'
+ctrl-shift-alt-cmd-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move prev'
+ctrl-shift-alt-cmd-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move next'
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#resize
 ctrl-cmd-alt-dash = 'resize smart -50'
 ctrl-cmd-alt-plus = 'resize smart +50'
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-ctrl-cmd-alt-1 = 'workspace 1'
-ctrl-cmd-alt-2 = 'workspace 2'
-ctrl-cmd-alt-3 = 'workspace 3'
-ctrl-cmd-alt-4 = 'workspace 4'
-ctrl-cmd-alt-5 = 'workspace 5'
-ctrl-cmd-alt-6 = 'workspace 6'
-ctrl-cmd-alt-7 = 'workspace 7'
-ctrl-cmd-alt-8 = 'workspace 8'
-ctrl-cmd-alt-9 = 'workspace 9'
-ctrl-cmd-alt-a = 'workspace A'
-ctrl-cmd-alt-b = 'workspace B'
-ctrl-cmd-alt-c = 'workspace C'
-ctrl-cmd-alt-d = 'workspace D'
-ctrl-cmd-alt-e = 'workspace E'
-ctrl-cmd-alt-f = 'workspace F'
-ctrl-cmd-alt-g = 'workspace G'
+# Within-space workspace nav (space A)
+ctrl-cmd-alt-0 = 'workspace A0'
+ctrl-cmd-alt-1 = 'workspace A1'
+ctrl-cmd-alt-2 = 'workspace A2'
+ctrl-cmd-alt-3 = 'workspace A3'
+ctrl-cmd-alt-4 = 'workspace A4'
+ctrl-cmd-alt-5 = 'workspace A5'
+ctrl-cmd-alt-6 = 'workspace A6'
+ctrl-cmd-alt-7 = 'workspace A7'
+ctrl-cmd-alt-8 = 'workspace A8'
+ctrl-cmd-alt-9 = 'workspace A9'
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-ctrl-shift-alt-cmd-1 = 'move-node-to-workspace 1'
-ctrl-shift-alt-cmd-2 = 'move-node-to-workspace 2'
-ctrl-shift-alt-cmd-3 = 'move-node-to-workspace 3'
-ctrl-shift-alt-cmd-4 = 'move-node-to-workspace 4'
-ctrl-shift-alt-cmd-5 = 'move-node-to-workspace 5'
-ctrl-shift-alt-cmd-6 = 'move-node-to-workspace 6'
-ctrl-shift-alt-cmd-7 = 'move-node-to-workspace 7'
-ctrl-shift-alt-cmd-8 = 'move-node-to-workspace 8'
-ctrl-shift-alt-cmd-9 = 'move-node-to-workspace 9'
-ctrl-shift-alt-cmd-a = 'move-node-to-workspace A'
-ctrl-shift-alt-cmd-b = 'move-node-to-workspace B'
-ctrl-shift-alt-cmd-c = 'move-node-to-workspace C'
-ctrl-shift-alt-cmd-d = 'move-node-to-workspace D'
-ctrl-shift-alt-cmd-e = 'move-node-to-workspace E'
-ctrl-shift-alt-cmd-f = 'move-node-to-workspace F'
-ctrl-shift-alt-cmd-g = 'move-node-to-workspace G'
+# Move window within space A
+ctrl-shift-alt-cmd-0 = 'move-node-to-workspace A0'
+ctrl-shift-alt-cmd-1 = 'move-node-to-workspace A1'
+ctrl-shift-alt-cmd-2 = 'move-node-to-workspace A2'
+ctrl-shift-alt-cmd-3 = 'move-node-to-workspace A3'
+ctrl-shift-alt-cmd-4 = 'move-node-to-workspace A4'
+ctrl-shift-alt-cmd-5 = 'move-node-to-workspace A5'
+ctrl-shift-alt-cmd-6 = 'move-node-to-workspace A6'
+ctrl-shift-alt-cmd-7 = 'move-node-to-workspace A7'
+ctrl-shift-alt-cmd-8 = 'move-node-to-workspace A8'
+ctrl-shift-alt-cmd-9 = 'move-node-to-workspace A9'
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
+# Switch space (already in A)
+ctrl-cmd-alt-a = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh A'
+ctrl-cmd-alt-b = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh B'
+ctrl-cmd-alt-c = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh C'
+ctrl-cmd-alt-d = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh D'
+ctrl-cmd-alt-e = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh E'
+
+# Move focused window to another space, preserving digit (A1 -> E1).
+ctrl-shift-alt-cmd-a = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh A'
+ctrl-shift-alt-cmd-b = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh B'
+ctrl-shift-alt-cmd-c = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh C'
+ctrl-shift-alt-cmd-d = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh D'
+ctrl-shift-alt-cmd-e = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh E'
+
 ctrl-cmd-alt-tab = 'workspace-back-and-forth'
-# See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
 ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#mode
+ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
+
 ctrl-shift-alt-cmd-aa = 'mode service'
 
-# 'service' binding mode declaration.
-# See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
+# ---------------------------------------------------------------------------
+# space-b mode = SPACE B
+# ---------------------------------------------------------------------------
+[mode.space-b.binding]
+
+ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
+    tell application "iTerm"
+        create window with default profile
+        activate
+    end tell'
+'''
+
+ctrl-shift-alt-cmd-right = 'layout floating tiling'
+ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
+
+ctrl-cmd-alt-u = 'focus --boundaries-action wrap-around-the-workspace left'
+ctrl-cmd-alt-i = 'focus --boundaries-action wrap-around-the-workspace down'
+ctrl-cmd-alt-o = 'focus --boundaries-action wrap-around-the-workspace up'
+ctrl-cmd-alt-p = 'focus --boundaries-action wrap-around-the-workspace right'
+
+ctrl-shift-alt-cmd-u = 'move left'
+ctrl-shift-alt-cmd-i = 'move down'
+ctrl-shift-alt-cmd-o = 'move up'
+ctrl-shift-alt-cmd-p = 'move right'
+
+ctrl-cmd-alt-h = 'focus-monitor --wrap-around prev'
+ctrl-cmd-alt-l = 'focus-monitor --wrap-around next'
+ctrl-cmd-alt-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus prev'
+ctrl-cmd-alt-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus next'
+
+ctrl-shift-alt-cmd-h = 'move-node-to-monitor --focus-follows-window --wrap-around prev'
+ctrl-shift-alt-cmd-l = 'move-node-to-monitor --focus-follows-window --wrap-around next'
+ctrl-shift-alt-cmd-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move prev'
+ctrl-shift-alt-cmd-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move next'
+
+ctrl-cmd-alt-dash = 'resize smart -50'
+ctrl-cmd-alt-plus = 'resize smart +50'
+
+ctrl-cmd-alt-0 = 'workspace B0'
+ctrl-cmd-alt-1 = 'workspace B1'
+ctrl-cmd-alt-2 = 'workspace B2'
+ctrl-cmd-alt-3 = 'workspace B3'
+ctrl-cmd-alt-4 = 'workspace B4'
+ctrl-cmd-alt-5 = 'workspace B5'
+ctrl-cmd-alt-6 = 'workspace B6'
+ctrl-cmd-alt-7 = 'workspace B7'
+ctrl-cmd-alt-8 = 'workspace B8'
+ctrl-cmd-alt-9 = 'workspace B9'
+
+ctrl-shift-alt-cmd-0 = 'move-node-to-workspace B0'
+ctrl-shift-alt-cmd-1 = 'move-node-to-workspace B1'
+ctrl-shift-alt-cmd-2 = 'move-node-to-workspace B2'
+ctrl-shift-alt-cmd-3 = 'move-node-to-workspace B3'
+ctrl-shift-alt-cmd-4 = 'move-node-to-workspace B4'
+ctrl-shift-alt-cmd-5 = 'move-node-to-workspace B5'
+ctrl-shift-alt-cmd-6 = 'move-node-to-workspace B6'
+ctrl-shift-alt-cmd-7 = 'move-node-to-workspace B7'
+ctrl-shift-alt-cmd-8 = 'move-node-to-workspace B8'
+ctrl-shift-alt-cmd-9 = 'move-node-to-workspace B9'
+
+ctrl-cmd-alt-a = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh A'
+ctrl-cmd-alt-b = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh B'
+ctrl-cmd-alt-c = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh C'
+ctrl-cmd-alt-d = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh D'
+ctrl-cmd-alt-e = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh E'
+
+# Move focused window to another space, preserving digit (A1 -> E1).
+ctrl-shift-alt-cmd-a = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh A'
+ctrl-shift-alt-cmd-b = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh B'
+ctrl-shift-alt-cmd-c = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh C'
+ctrl-shift-alt-cmd-d = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh D'
+ctrl-shift-alt-cmd-e = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh E'
+
+ctrl-cmd-alt-tab = 'workspace-back-and-forth'
+ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
+
+ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
+
+ctrl-shift-alt-cmd-aa = 'mode service'
+
+# ---------------------------------------------------------------------------
+# space-c mode = SPACE C
+# ---------------------------------------------------------------------------
+[mode.space-c.binding]
+
+ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
+    tell application "iTerm"
+        create window with default profile
+        activate
+    end tell'
+'''
+
+ctrl-shift-alt-cmd-right = 'layout floating tiling'
+ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
+
+ctrl-cmd-alt-u = 'focus --boundaries-action wrap-around-the-workspace left'
+ctrl-cmd-alt-i = 'focus --boundaries-action wrap-around-the-workspace down'
+ctrl-cmd-alt-o = 'focus --boundaries-action wrap-around-the-workspace up'
+ctrl-cmd-alt-p = 'focus --boundaries-action wrap-around-the-workspace right'
+
+ctrl-shift-alt-cmd-u = 'move left'
+ctrl-shift-alt-cmd-i = 'move down'
+ctrl-shift-alt-cmd-o = 'move up'
+ctrl-shift-alt-cmd-p = 'move right'
+
+ctrl-cmd-alt-h = 'focus-monitor --wrap-around prev'
+ctrl-cmd-alt-l = 'focus-monitor --wrap-around next'
+ctrl-cmd-alt-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus prev'
+ctrl-cmd-alt-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus next'
+
+ctrl-shift-alt-cmd-h = 'move-node-to-monitor --focus-follows-window --wrap-around prev'
+ctrl-shift-alt-cmd-l = 'move-node-to-monitor --focus-follows-window --wrap-around next'
+ctrl-shift-alt-cmd-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move prev'
+ctrl-shift-alt-cmd-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move next'
+
+ctrl-cmd-alt-dash = 'resize smart -50'
+ctrl-cmd-alt-plus = 'resize smart +50'
+
+ctrl-cmd-alt-0 = 'workspace C0'
+ctrl-cmd-alt-1 = 'workspace C1'
+ctrl-cmd-alt-2 = 'workspace C2'
+ctrl-cmd-alt-3 = 'workspace C3'
+ctrl-cmd-alt-4 = 'workspace C4'
+ctrl-cmd-alt-5 = 'workspace C5'
+ctrl-cmd-alt-6 = 'workspace C6'
+ctrl-cmd-alt-7 = 'workspace C7'
+ctrl-cmd-alt-8 = 'workspace C8'
+ctrl-cmd-alt-9 = 'workspace C9'
+
+ctrl-shift-alt-cmd-0 = 'move-node-to-workspace C0'
+ctrl-shift-alt-cmd-1 = 'move-node-to-workspace C1'
+ctrl-shift-alt-cmd-2 = 'move-node-to-workspace C2'
+ctrl-shift-alt-cmd-3 = 'move-node-to-workspace C3'
+ctrl-shift-alt-cmd-4 = 'move-node-to-workspace C4'
+ctrl-shift-alt-cmd-5 = 'move-node-to-workspace C5'
+ctrl-shift-alt-cmd-6 = 'move-node-to-workspace C6'
+ctrl-shift-alt-cmd-7 = 'move-node-to-workspace C7'
+ctrl-shift-alt-cmd-8 = 'move-node-to-workspace C8'
+ctrl-shift-alt-cmd-9 = 'move-node-to-workspace C9'
+
+ctrl-cmd-alt-a = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh A'
+ctrl-cmd-alt-b = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh B'
+ctrl-cmd-alt-c = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh C'
+ctrl-cmd-alt-d = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh D'
+ctrl-cmd-alt-e = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh E'
+
+# Move focused window to another space, preserving digit (A1 -> E1).
+ctrl-shift-alt-cmd-a = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh A'
+ctrl-shift-alt-cmd-b = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh B'
+ctrl-shift-alt-cmd-c = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh C'
+ctrl-shift-alt-cmd-d = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh D'
+ctrl-shift-alt-cmd-e = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh E'
+
+ctrl-cmd-alt-tab = 'workspace-back-and-forth'
+ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
+
+ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
+
+ctrl-shift-alt-cmd-aa = 'mode service'
+
+# ---------------------------------------------------------------------------
+# space-d mode = SPACE D
+# ---------------------------------------------------------------------------
+[mode.space-d.binding]
+
+ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
+    tell application "iTerm"
+        create window with default profile
+        activate
+    end tell'
+'''
+
+ctrl-shift-alt-cmd-right = 'layout floating tiling'
+ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
+
+ctrl-cmd-alt-u = 'focus --boundaries-action wrap-around-the-workspace left'
+ctrl-cmd-alt-i = 'focus --boundaries-action wrap-around-the-workspace down'
+ctrl-cmd-alt-o = 'focus --boundaries-action wrap-around-the-workspace up'
+ctrl-cmd-alt-p = 'focus --boundaries-action wrap-around-the-workspace right'
+
+ctrl-shift-alt-cmd-u = 'move left'
+ctrl-shift-alt-cmd-i = 'move down'
+ctrl-shift-alt-cmd-o = 'move up'
+ctrl-shift-alt-cmd-p = 'move right'
+
+ctrl-cmd-alt-h = 'focus-monitor --wrap-around prev'
+ctrl-cmd-alt-l = 'focus-monitor --wrap-around next'
+ctrl-cmd-alt-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus prev'
+ctrl-cmd-alt-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus next'
+
+ctrl-shift-alt-cmd-h = 'move-node-to-monitor --focus-follows-window --wrap-around prev'
+ctrl-shift-alt-cmd-l = 'move-node-to-monitor --focus-follows-window --wrap-around next'
+ctrl-shift-alt-cmd-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move prev'
+ctrl-shift-alt-cmd-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move next'
+
+ctrl-cmd-alt-dash = 'resize smart -50'
+ctrl-cmd-alt-plus = 'resize smart +50'
+
+ctrl-cmd-alt-0 = 'workspace D0'
+ctrl-cmd-alt-1 = 'workspace D1'
+ctrl-cmd-alt-2 = 'workspace D2'
+ctrl-cmd-alt-3 = 'workspace D3'
+ctrl-cmd-alt-4 = 'workspace D4'
+ctrl-cmd-alt-5 = 'workspace D5'
+ctrl-cmd-alt-6 = 'workspace D6'
+ctrl-cmd-alt-7 = 'workspace D7'
+ctrl-cmd-alt-8 = 'workspace D8'
+ctrl-cmd-alt-9 = 'workspace D9'
+
+ctrl-shift-alt-cmd-0 = 'move-node-to-workspace D0'
+ctrl-shift-alt-cmd-1 = 'move-node-to-workspace D1'
+ctrl-shift-alt-cmd-2 = 'move-node-to-workspace D2'
+ctrl-shift-alt-cmd-3 = 'move-node-to-workspace D3'
+ctrl-shift-alt-cmd-4 = 'move-node-to-workspace D4'
+ctrl-shift-alt-cmd-5 = 'move-node-to-workspace D5'
+ctrl-shift-alt-cmd-6 = 'move-node-to-workspace D6'
+ctrl-shift-alt-cmd-7 = 'move-node-to-workspace D7'
+ctrl-shift-alt-cmd-8 = 'move-node-to-workspace D8'
+ctrl-shift-alt-cmd-9 = 'move-node-to-workspace D9'
+
+ctrl-cmd-alt-a = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh A'
+ctrl-cmd-alt-b = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh B'
+ctrl-cmd-alt-c = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh C'
+ctrl-cmd-alt-d = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh D'
+ctrl-cmd-alt-e = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh E'
+
+# Move focused window to another space, preserving digit (A1 -> E1).
+ctrl-shift-alt-cmd-a = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh A'
+ctrl-shift-alt-cmd-b = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh B'
+ctrl-shift-alt-cmd-c = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh C'
+ctrl-shift-alt-cmd-d = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh D'
+ctrl-shift-alt-cmd-e = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh E'
+
+ctrl-cmd-alt-tab = 'workspace-back-and-forth'
+ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
+
+ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
+
+ctrl-shift-alt-cmd-aa = 'mode service'
+
+# ---------------------------------------------------------------------------
+# space-e mode = SPACE E
+# ---------------------------------------------------------------------------
+[mode.space-e.binding]
+
+ctrl-cmd-alt-enter = '''exec-and-forget osascript -e '
+    tell application "iTerm"
+        create window with default profile
+        activate
+    end tell'
+'''
+
+ctrl-shift-alt-cmd-right = 'layout floating tiling'
+ctrl-shift-alt-cmd-left = 'layout tiles horizontal vertical'
+
+ctrl-cmd-alt-u = 'focus --boundaries-action wrap-around-the-workspace left'
+ctrl-cmd-alt-i = 'focus --boundaries-action wrap-around-the-workspace down'
+ctrl-cmd-alt-o = 'focus --boundaries-action wrap-around-the-workspace up'
+ctrl-cmd-alt-p = 'focus --boundaries-action wrap-around-the-workspace right'
+
+ctrl-shift-alt-cmd-u = 'move left'
+ctrl-shift-alt-cmd-i = 'move down'
+ctrl-shift-alt-cmd-o = 'move up'
+ctrl-shift-alt-cmd-p = 'move right'
+
+ctrl-cmd-alt-h = 'focus-monitor --wrap-around prev'
+ctrl-cmd-alt-l = 'focus-monitor --wrap-around next'
+ctrl-cmd-alt-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus prev'
+ctrl-cmd-alt-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh focus next'
+
+ctrl-shift-alt-cmd-h = 'move-node-to-monitor --focus-follows-window --wrap-around prev'
+ctrl-shift-alt-cmd-l = 'move-node-to-monitor --focus-follows-window --wrap-around next'
+ctrl-shift-alt-cmd-j = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move prev'
+ctrl-shift-alt-cmd-k = 'exec-and-forget /Users/bertmad/.config/aerospace/cycle.sh move next'
+
+ctrl-cmd-alt-dash = 'resize smart -50'
+ctrl-cmd-alt-plus = 'resize smart +50'
+
+ctrl-cmd-alt-0 = 'workspace E0'
+ctrl-cmd-alt-1 = 'workspace E1'
+ctrl-cmd-alt-2 = 'workspace E2'
+ctrl-cmd-alt-3 = 'workspace E3'
+ctrl-cmd-alt-4 = 'workspace E4'
+ctrl-cmd-alt-5 = 'workspace E5'
+ctrl-cmd-alt-6 = 'workspace E6'
+ctrl-cmd-alt-7 = 'workspace E7'
+ctrl-cmd-alt-8 = 'workspace E8'
+ctrl-cmd-alt-9 = 'workspace E9'
+
+ctrl-shift-alt-cmd-0 = 'move-node-to-workspace E0'
+ctrl-shift-alt-cmd-1 = 'move-node-to-workspace E1'
+ctrl-shift-alt-cmd-2 = 'move-node-to-workspace E2'
+ctrl-shift-alt-cmd-3 = 'move-node-to-workspace E3'
+ctrl-shift-alt-cmd-4 = 'move-node-to-workspace E4'
+ctrl-shift-alt-cmd-5 = 'move-node-to-workspace E5'
+ctrl-shift-alt-cmd-6 = 'move-node-to-workspace E6'
+ctrl-shift-alt-cmd-7 = 'move-node-to-workspace E7'
+ctrl-shift-alt-cmd-8 = 'move-node-to-workspace E8'
+ctrl-shift-alt-cmd-9 = 'move-node-to-workspace E9'
+
+ctrl-cmd-alt-a = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh A'
+ctrl-cmd-alt-b = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh B'
+ctrl-cmd-alt-c = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh C'
+ctrl-cmd-alt-d = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh D'
+ctrl-cmd-alt-e = 'exec-and-forget /Users/bertmad/.config/aerospace/goto-space.sh E'
+
+# Move focused window to another space, preserving digit (A1 -> E1).
+ctrl-shift-alt-cmd-a = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh A'
+ctrl-shift-alt-cmd-b = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh B'
+ctrl-shift-alt-cmd-c = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh C'
+ctrl-shift-alt-cmd-d = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh D'
+ctrl-shift-alt-cmd-e = 'exec-and-forget /Users/bertmad/.config/aerospace/move-to-space.sh E'
+
+ctrl-cmd-alt-tab = 'workspace-back-and-forth'
+ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
+
+ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
+
+ctrl-shift-alt-cmd-aa = 'mode service'
+
+# ---------------------------------------------------------------------------
+# service mode
+# ---------------------------------------------------------------------------
 [mode.service.binding]
 esc = ['reload-config', 'mode main']
-r = ['flatten-workspace-tree', 'mode main'] # reset layout
-#s = ['layout sticky tiling', 'mode main'] # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
-f = ['fullscreen', 'mode main'] # Toggle between floating and tiling layout
+r = ['flatten-workspace-tree', 'mode main']
+f = ['fullscreen', 'mode main']
 backspace = ['close-all-windows-but-current', 'mode main']
 
 ctrl-cmd-alt-h = ['join-with left', 'mode main']
@@ -197,20 +502,58 @@ ctrl-cmd-alt-j = ['join-with down', 'mode main']
 ctrl-cmd-alt-k = ['join-with up', 'mode main']
 ctrl-cmd-alt-l = ['join-with right', 'mode main']
 
+# ============================================================================
+# Monitor assignment
+# A0..D9 -> main, E0..E9 -> secondary
+# ============================================================================
 [workspace-to-monitor-force-assignment]
-1 = 'main'
-2 = 'main'
-3 = 'main'
-4 = 'main'
-5 = 'main'
-6 = 'main'
-7 = 'main'
-8 = 'main'
-9 = 'main'
-A = 'secondary'
-B = 'secondary'
-C = 'secondary'
-D = 'secondary'
-E = 'secondary'
-F = 'secondary'
-G = 'secondary'
+A0 = 'main'
+A1 = 'main'
+A2 = 'main'
+A3 = 'main'
+A4 = 'main'
+A5 = 'main'
+A6 = 'main'
+A7 = 'main'
+A8 = 'main'
+A9 = 'main'
+B0 = 'main'
+B1 = 'main'
+B2 = 'main'
+B3 = 'main'
+B4 = 'main'
+B5 = 'main'
+B6 = 'main'
+B7 = 'main'
+B8 = 'main'
+B9 = 'main'
+C0 = 'main'
+C1 = 'main'
+C2 = 'main'
+C3 = 'main'
+C4 = 'main'
+C5 = 'main'
+C6 = 'main'
+C7 = 'main'
+C8 = 'main'
+C9 = 'main'
+D0 = 'main'
+D1 = 'main'
+D2 = 'main'
+D3 = 'main'
+D4 = 'main'
+D5 = 'main'
+D6 = 'main'
+D7 = 'main'
+D8 = 'main'
+D9 = 'main'
+E0 = 'secondary'
+E1 = 'secondary'
+E2 = 'secondary'
+E3 = 'secondary'
+E4 = 'secondary'
+E5 = 'secondary'
+E6 = 'secondary'
+E7 = 'secondary'
+E8 = 'secondary'
+E9 = 'secondary'

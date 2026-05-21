@@ -1,10 +1,14 @@
 #!/bin/bash
-# For differentiating between workspaces with and without windows (in or not in use)
+# Differentiate workspaces with windows (bright label) from empty ones (dim).
+# Multi-char workspace names (A0..E9) — must iterate, not use char-class regex.
 
-USED_SPACES=$(aerospace list-windows --all --format '%{workspace}' | sort | uniq)
+USED=$(aerospace list-windows --all --format '%{workspace}' | sort -u)
+ALL=$(aerospace list-workspaces --all)
 
-sketchybar --set "/space\.[^$(echo $USED_SPACES | tr -d '\n')]/" label.color="0x77ffffff"
-
-for sid in $USED_SPACES; do
-  sketchybar --set "space.$sid" label.color="0xffffffff"
+for WS in $ALL; do
+    if printf '%s\n' "$USED" | grep -qx "$WS"; then
+        sketchybar --set "space.$WS" label.color=0xffffffff
+    else
+        sketchybar --set "space.$WS" label.color=0x77ffffff
+    fi
 done

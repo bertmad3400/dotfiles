@@ -28,24 +28,76 @@ sketchybar --default "${default[@]}"
 
 
 ##### Spaces #####
+# Layered workspaces: 5 "spaces" A..E, each with 10 workspaces (X0..X9).
+# Bar shows: [A][B][C][D][E] | [X0][X1]...[X9]  where X is the active space.
 
 sketchybar --add event aerospace_workspace_change
 
-for WORKSPACE_AND_DISPLAY in $(aerospace list-workspaces --all --format "%{workspace},%{monitor-id}"); do
+CURRENT_FOCUSED=$(aerospace list-workspaces --focused)
+CURRENT_LETTER="${CURRENT_FOCUSED:0:1}"
 
-    WORKSPACE=$(echo $WORKSPACE_AND_DISPLAY | cut -d, -f1)
-    DISPLAY=$(echo $WORKSPACE_AND_DISPLAY | cut -d, -f2)
+# Space-letter indicators (one per "space"). Only the active one is drawn.
+for L in A B C D E; do
+    if [[ "$L" == "$CURRENT_LETTER" ]]; then
+        LETTER_DRAW="on"
+    else
+        LETTER_DRAW="off"
+    fi
+
+    sketchybar --add item spaceletter.$L left \
+        --set spaceletter.$L \
+        drawing=$LETTER_DRAW \
+        label="$L" \
+        label.color=0xffffffff \
+        label.font="Hack Nerd Font:Bold:16.0" \
+        label.padding_left=6 \
+        label.padding_right=6 \
+        icon.padding_left=0 \
+        icon.padding_right=0 \
+        background.color=0x44ffffff \
+        background.corner_radius=5 \
+        background.height=20 \
+        background.drawing=on \
+        click_script="$PLUGIN_DIR/aerospace-goto.sh ${L}0"
+done
+
+# Visual divider between space letters and workspaces
+sketchybar --add item space.divider left \
+    --set space.divider \
+        label="|" \
+        label.color="0x55ffffff" \
+        label.padding_left=0 \
+        label.padding_right=4 \
+        icon.padding_left=2 \
+        icon.padding_right=2
+
+# Per-workspace items (50 total). Only the current space's 10 are visible.
+# Order within a space: 1,2,3,4,5,6,7,8,9,0 (0 last). Cache the workspace->display
+# mapping once to avoid querying aerospace 50 times.
+WS_LIST=$(aerospace list-workspaces --all --format "%{workspace},%{monitor-id}")
+
+for WS_LETTER in A B C D E; do
+    for WS_DIGIT in 1 2 3 4 5 6 7 8 9 0; do
+        WORKSPACE="${WS_LETTER}${WS_DIGIT}"
+        DISPLAY=$(printf '%s\n' "$WS_LIST" | grep "^${WORKSPACE}," | cut -d, -f2)
+
+    if [[ "$WS_LETTER" == "$CURRENT_LETTER" ]]; then
+        WS_DRAW="on"
+    else
+        WS_DRAW="off"
+    fi
 
     sketchybar --add item space.$WORKSPACE left \
         --set space.$WORKSPACE \
         display=$DISPLAY \
-        label="$WORKSPACE" \
+        drawing=$WS_DRAW \
+        label="$WS_DIGIT" \
         label.color="0xffffffff" \
         label.drawing=on \
         label.font="Hack Nerd Font:Bold:16.0" \
         label.padding_left=6 \
         label.padding_right=6 \
-        icon="$WORKSPACE" \
+        icon="$WS_DIGIT" \
         icon.color="0xff000000" \
         icon.font="Hack Nerd Font:Bold:16.0" \
         icon.padding_left=6 \
@@ -55,25 +107,37 @@ for WORKSPACE_AND_DISPLAY in $(aerospace list-workspaces --all --format "%{works
         background.corner_radius=5 \
         background.height=20 \
         background.drawing=off \
-        click_script="aerospace workspace $WORKSPACE"
+        click_script="$PLUGIN_DIR/aerospace-goto.sh $WORKSPACE"
+    done
 done
 
 sketchybar --add item space.focus left --set space.focus script="$PLUGIN_DIR/aerospace-focus.sh" --subscribe space.focus aerospace_workspace_change
 sketchybar --add item space.used left --set space.used script="$PLUGIN_DIR/aerospace-used.sh" update_freq=1
 
-##### Ressources #####
-
-
-
-
-# Network connection (ip/vpn/no connection)
-sketchybar --add item ip right                          \
-           --set      ip script="$PLUGIN_DIR/ip.sh"     \
-                           update_freq=30               \
-
-
-sketchybar --add item divider.1 right \
+# Divider
+sketchybar --add item divider.1 left \
            --set      divider.1 \
+                                background.color=0x66ffffff \
+                                background.corner_radius=5  \
+                                background.height=16        \
+                                label.padding_right=0       \
+                                label.padding_left=0        \
+                                icon.padding_right=0        \
+                                icon.padding_left=0         \
+                                background.padding_left=-2   \
+                                background.padding_right=16
+
+# Date and time
+sketchybar --add item datetime left                                  \
+           --set      datetime script="$PLUGIN_DIR/datetime.sh"      \
+                               update_freq=1                         \
+                               icon=                                \
+                               icon.color=$COLOR_YELLOW              \
+                               label.color=$COLOR_YELLOW
+
+# Divider
+sketchybar --add item divider.dt left \
+           --set      divider.dt \
                                 background.color=0x66ffffff \
                                 background.corner_radius=5  \
                                 background.height=16        \
@@ -83,6 +147,16 @@ sketchybar --add item divider.1 right \
                                 icon.padding_left=0         \
                                 background.padding_left=16  \
                                 background.padding_right=16
+
+# Network connection (ip/vpn/no connection)
+sketchybar --add item ip left                           \
+           --set      ip script="$PLUGIN_DIR/ip.sh"     \
+                         update_freq=30
+
+##### Ressources #####
+
+
+
 
 # Network traffic
 sketchybar --add item network_up right                  \
@@ -103,6 +177,35 @@ sketchybar --add item network_down right                \
 # Divider
 sketchybar --add item divider.2 right \
            --set      divider.2 \
+                                background.color=0x66ffffff \
+                                background.corner_radius=5  \
+                                background.height=16        \
+                                label.padding_right=0       \
+                                label.padding_left=0        \
+                                icon.padding_right=0        \
+                                icon.padding_left=0         \
+                                background.padding_left=0  \
+                                background.padding_right=16
+
+
+# Disk I/O (read/write throughput)
+sketchybar --add item diskio_read right                 \
+           --set      diskio_read                       \
+                           icon=󰄝                       \
+                           icon.color=$COLOR_GREEN      \
+                           label.color=$COLOR_GREEN     \
+                           label.width=60
+
+sketchybar --add item diskio_write right                \
+           --set      diskio_write                      \
+                           icon=󰄠                       \
+                           icon.color=$COLOR_MAGENTA    \
+                           label.color=$COLOR_MAGENTA   \
+                           label.width=60
+
+# Divider
+sketchybar --add item divider.4 right \
+           --set      divider.4 \
                                 background.color=0x66ffffff \
                                 background.corner_radius=5  \
                                 background.height=16        \
@@ -152,7 +255,7 @@ sketchybar --add item swap right                        \
 # Ram
 sketchybar --add item ram right                         \
            --set      ram script="$PLUGIN_DIR/ram.sh"   \
-                          update_freq=5                 \
+                          update_freq=1                 \
                           icon=󰓅                        \
                           icon.color=$COLOR_GREEN       \
                           label.color=$COLOR_GREEN      \
@@ -180,6 +283,7 @@ sketchybar --add item cpu right \
 
 
 source "$PLUGIN_DIR/network.sh"
+source "$PLUGIN_DIR/diskio.sh"
 
 ##### Force all scripts to run the first time (never do this in a script) #####
 sketchybar --update
