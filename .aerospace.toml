@@ -78,7 +78,7 @@ backtick="equal"
 # - `main` mode IS space A (AeroSpace requires a `main` mode).
 # - `space-b`..`space-e` modes correspond to spaces B..E.
 # - Within any mode, ctrl-cmd-alt-{0..9} jumps to that space's workspace N.
-# - ctrl-cmd-alt-{a..e} switches active space (mode + jump to X0).
+# - ctrl-cmd-alt-{a..e} switches active space (mode + jump to X1).
 # - ctrl-shift-alt-cmd-{0..9} moves the focused window to workspace N in the
 #   current space.
 # - All non-workspace bindings (focus/move/resize/terminal/service) are

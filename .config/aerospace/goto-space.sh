@@ -1,6 +1,6 @@
 #!/bin/bash
 # Switch to another "space" (A..E), restoring the last digit visited in that
-# letter (defaulting to 0 if never visited this session).
+# letter (defaulting to 1 if never visited this session).
 # Also switches binding mode so digit keys keep matching the active space.
 #
 # Usage: goto-space.sh <letter>
@@ -19,7 +19,7 @@ esac
 STATE_DIR="${TMPDIR:-/tmp}"
 STATE_DIR="${STATE_DIR%/}/aerospace-last-digit"
 DIGIT=$(cat "$STATE_DIR/$LETTER" 2>/dev/null)
-[ -z "$DIGIT" ] && DIGIT=0
+[ -z "$DIGIT" ] && DIGIT=1
 
 aerospace mode "$MODE"
 aerospace workspace "${LETTER}${DIGIT}"

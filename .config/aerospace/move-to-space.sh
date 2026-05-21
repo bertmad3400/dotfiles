@@ -1,6 +1,6 @@
 #!/bin/bash
 # Move focused window to another "space" (A..E), targeting the last digit
-# visited in that letter (defaulting to 0 if never visited this session).
+# visited in that letter (defaulting to 1 if never visited this session).
 # Does NOT follow the window — focus stays put.
 #
 # Usage: move-to-space.sh <letter>
@@ -15,6 +15,6 @@ esac
 STATE_DIR="${TMPDIR:-/tmp}"
 STATE_DIR="${STATE_DIR%/}/aerospace-last-digit"
 DIGIT=$(cat "$STATE_DIR/$LETTER" 2>/dev/null)
-[ -z "$DIGIT" ] && DIGIT=0
+[ -z "$DIGIT" ] && DIGIT=1
 
 aerospace move-node-to-workspace "${LETTER}${DIGIT}"
