@@ -14,7 +14,11 @@ human_readable() {
   fi
 }
 
-pkill -f "netstat -w1"
+# Kill any previous netstat pipeline from a prior sketchybar load and wait
+# for it to actually exit before starting a new one — otherwise multiple
+# pipelines push --set updates concurrently, causing bursty sub-second updates.
+pkill -f "netstat -w 1" 2>/dev/null
+while pgrep -f "netstat -w 1" >/dev/null; do sleep 0.05; done
 
 # Use netstat with the -w flag to monitor network traffic continuously
 netstat -w 1 | awk '/[0-9]/ {print $3 "," $6; fflush(stdout)}' | while read -r total_bytes; do

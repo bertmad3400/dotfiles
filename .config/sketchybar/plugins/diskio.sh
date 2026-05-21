@@ -34,6 +34,9 @@ if [ "$1" = "--loop" ]; then
   exit 0
 fi
 
-# Kill any previous loop, then start a fresh one.
+# Kill any previous loop and wait for it to exit before starting a fresh one.
+# pkill is async, so without the wait the old loop can briefly run alongside
+# the new one and double-push updates.
 pkill -f "diskio.sh --loop" 2>/dev/null
+while pgrep -f "diskio.sh --loop" >/dev/null; do sleep 0.05; done
 "$0" --loop &
