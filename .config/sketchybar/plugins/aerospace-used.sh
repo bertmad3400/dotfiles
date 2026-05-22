@@ -1,14 +1,18 @@
 #!/bin/bash
 # Differentiate workspaces with windows (bright label) from empty ones (dim).
-# Multi-char workspace names (A0..E9) — must iterate, not use char-class regex.
+# With 10 shared digit items, only the current letter's workspaces are queried.
 
+FOCUSED=$(aerospace list-workspaces --focused)
+LETTER="${FOCUSED:0:1}"
 USED=$(aerospace list-windows --all --format '%{workspace}' | sort -u)
-ALL=$(aerospace list-workspaces --all)
 
-for WS in $ALL; do
-    if printf '%s\n' "$USED" | grep -qx "$WS"; then
-        sketchybar --set "space.$WS" label.color=0xffffffff
+args=()
+for d in 0 1 2 3 4 5 6 7 8 9; do
+    ws="${LETTER}${d}"
+    if printf '%s\n' "$USED" | grep -qx "$ws"; then
+        args+=(--set "space.$d" label.color=0xffffffff)
     else
-        sketchybar --set "space.$WS" label.color=0x77ffffff
+        args+=(--set "space.$d" label.color=0x77ffffff)
     fi
 done
+sketchybar "${args[@]}"

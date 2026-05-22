@@ -71,29 +71,32 @@ sketchybar --add item space.divider left \
         icon.padding_left=2 \
         icon.padding_right=2
 
-# Per-workspace items (50 total). Only the current space's 10 are visible.
-# Order within a space: 1,2,3,4,5,6,7,8,9,0 (0 last). Cache the workspace->display
-# mapping once to avoid querying aerospace 50 times.
+# Per-workspace items: 10 shared digit items, retargeted on letter change.
+# Order in bar: 1,2,3,4,5,6,7,8,9,0 (0 last).
 WS_LIST=$(aerospace list-workspaces --all --format "%{workspace},%{monitor-id}")
+USED=$(aerospace list-windows --all --format '%{workspace}' | sort -u)
+CURRENT_DIGIT="${CURRENT_FOCUSED:1:1}"
 
-for WS_LETTER in A B C D E; do
-    for WS_DIGIT in 1 2 3 4 5 6 7 8 9 0; do
-        WORKSPACE="${WS_LETTER}${WS_DIGIT}"
-        DISPLAY=$(printf '%s\n' "$WS_LIST" | grep "^${WORKSPACE}," | cut -d, -f2)
-
-    if [[ "$WS_LETTER" == "$CURRENT_LETTER" ]]; then
-        WS_DRAW="on"
+for WS_DIGIT in 1 2 3 4 5 6 7 8 9 0; do
+    WORKSPACE="${CURRENT_LETTER}${WS_DIGIT}"
+    DISPLAY=$(printf '%s\n' "$WS_LIST" | grep "^${WORKSPACE}," | cut -d, -f2)
+    if printf '%s\n' "$USED" | grep -qx "$WORKSPACE"; then
+        LABEL_COLOR=0xffffffff
     else
-        WS_DRAW="off"
+        LABEL_COLOR=0x77ffffff
+    fi
+    if [[ "$WS_DIGIT" == "$CURRENT_DIGIT" ]]; then
+        LABEL_DRAW=off; ICON_DRAW=on; BG_DRAW=on
+    else
+        LABEL_DRAW=on;  ICON_DRAW=off; BG_DRAW=off
     fi
 
-    sketchybar --add item space.$WORKSPACE left \
-        --set space.$WORKSPACE \
+    sketchybar --add item space.$WS_DIGIT left \
+        --set space.$WS_DIGIT \
         display=$DISPLAY \
-        drawing=$WS_DRAW \
         label="$WS_DIGIT" \
-        label.color="0xffffffff" \
-        label.drawing=on \
+        label.color="$LABEL_COLOR" \
+        label.drawing=$LABEL_DRAW \
         label.font="Hack Nerd Font:Bold:16.0" \
         label.padding_left=6 \
         label.padding_right=6 \
@@ -102,13 +105,12 @@ for WS_LETTER in A B C D E; do
         icon.font="Hack Nerd Font:Bold:16.0" \
         icon.padding_left=6 \
         icon.padding_right=6 \
-        icon.drawing=off \
+        icon.drawing=$ICON_DRAW \
         background.color=0xffffffff \
         background.corner_radius=5 \
         background.height=20 \
-        background.drawing=off \
+        background.drawing=$BG_DRAW \
         click_script="$PLUGIN_DIR/aerospace-goto.sh $WORKSPACE"
-    done
 done
 
 sketchybar --add item space.focus left --set space.focus script="$PLUGIN_DIR/aerospace-focus.sh" --subscribe space.focus aerospace_workspace_change
