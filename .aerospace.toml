@@ -159,6 +159,8 @@ ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
 
 ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
 
+ctrl-cmd-alt-w = 'close'
+
 ctrl-shift-alt-cmd-aa = 'mode service'
 
 # ---------------------------------------------------------------------------
@@ -231,6 +233,8 @@ ctrl-cmd-alt-tab = 'workspace-back-and-forth'
 ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
 
 ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
+
+ctrl-cmd-alt-w = 'close'
 
 ctrl-shift-alt-cmd-aa = 'mode service'
 
@@ -305,6 +309,8 @@ ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
 
 ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
 
+ctrl-cmd-alt-w = 'close'
+
 ctrl-shift-alt-cmd-aa = 'mode service'
 
 # ---------------------------------------------------------------------------
@@ -378,6 +384,8 @@ ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
 
 ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
 
+ctrl-cmd-alt-w = 'close'
+
 ctrl-shift-alt-cmd-aa = 'mode service'
 
 # ---------------------------------------------------------------------------
@@ -450,6 +458,8 @@ ctrl-cmd-alt-tab = 'workspace-back-and-forth'
 ctrl-shift-alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
 
 ctrl-shift-alt-cmd-s = 'exec-and-forget sketchybar --reload'
+
+ctrl-cmd-alt-w = 'close'
 
 ctrl-shift-alt-cmd-aa = 'mode service'
 
